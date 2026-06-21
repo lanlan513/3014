@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Disc3, Heart, Map } from 'lucide-react';
+import { Home, Disc3, Heart, Map, Disc } from 'lucide-react';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { moods } from '@/data/moods';
 
@@ -64,6 +64,18 @@ const NavBar = () => {
               >
                 <Map size={16} />
                 <span className="hidden md:inline">城市</span>
+              </Link>
+
+              <Link
+                to="/albums"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/album')
+                    ? 'bg-neon-pink/20 text-neon-pink border border-neon-pink/30'
+                    : 'text-warm-100/70 hover:text-neon-pink hover:bg-neon-pink/10'
+                }`}
+              >
+                <Disc size={16} />
+                <span className="hidden md:inline">专辑</span>
               </Link>
 
               <div className="hidden sm:flex items-center gap-0.5">

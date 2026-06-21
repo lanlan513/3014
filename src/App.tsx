@@ -5,6 +5,8 @@ import ShelfPage from '@/pages/ShelfPage';
 import RecordDetailPage from '@/pages/RecordDetailPage';
 import FavoritesPage from '@/pages/FavoritesPage';
 import CityMapPage from '@/pages/CityMapPage';
+import AlbumTimelinePage from '@/pages/AlbumTimelinePage';
+import AlbumDetailPage from '@/pages/AlbumDetailPage';
 import NavBar from '@/components/layout/NavBar';
 import FilmGrain, { FilmScratches } from '@/components/layout/FilmGrain';
 import WarmLightOverlay from '@/components/layout/WarmLight';
@@ -21,6 +23,8 @@ export default function App() {
             <Route path="/shelves/:mood" element={<ShelfPage />} />
             <Route path="/record/:id" element={<RecordDetailPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
+            <Route path="/albums" element={<AlbumTimelinePage />} />
+            <Route path="/album/:id" element={<AlbumDetailPage />} />
             <Route
               path="*"
               element={
