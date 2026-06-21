@@ -18,6 +18,7 @@ import { getRecordById, getRelatedRecords } from '@/data/records';
 import { getMoodById } from '@/data/moods';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import RecordCover from '@/components/shelf/RecordCover';
+import FujiSnowMountain from '@/components/fuji/FujiSnowMountain';
 
 const RecordDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -405,6 +406,19 @@ const RecordDetailPage = () => {
                 </button>
               </div>
             </motion.div>
+
+            {record.id === 'fu-shi' && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className="mb-16"
+              >
+                <div className="w-full h-px bg-gradient-to-r from-transparent via-warm-300/30 to-transparent mb-12" />
+                <FujiSnowMountain isNight={mood.id === 'lonely'} />
+              </motion.div>
+            )}
 
             {related.length > 0 && (
               <motion.div
