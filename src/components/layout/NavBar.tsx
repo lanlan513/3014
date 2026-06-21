@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Disc3, Heart } from 'lucide-react';
+import { Home, Disc3, Heart, Map } from 'lucide-react';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { moods } from '@/data/moods';
 
@@ -45,13 +45,25 @@ const NavBar = () => {
               <Link
                 to="/"
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
-                  isActive('/') && !location.pathname.startsWith('/shelves') && !location.pathname.startsWith('/record') && !location.pathname.startsWith('/favorites')
+                  isActive('/') && !location.pathname.startsWith('/map') && !location.pathname.startsWith('/shelves') && !location.pathname.startsWith('/record') && !location.pathname.startsWith('/favorites')
                     ? 'bg-warm-300/20 text-warm-300 border border-warm-300/30'
                     : 'text-warm-100/70 hover:text-warm-300 hover:bg-warm-300/10'
                 }`}
               >
                 <Home size={16} />
                 <span className="hidden md:inline">街角</span>
+              </Link>
+
+              <Link
+                to="/map"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/map')
+                    ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
+                    : 'text-warm-100/70 hover:text-neon-cyan hover:bg-neon-cyan/10'
+                }`}
+              >
+                <Map size={16} />
+                <span className="hidden md:inline">城市</span>
               </Link>
 
               <div className="hidden sm:flex items-center gap-0.5">

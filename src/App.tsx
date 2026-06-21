@@ -4,6 +4,7 @@ import HomePage from '@/pages/HomePage';
 import ShelfPage from '@/pages/ShelfPage';
 import RecordDetailPage from '@/pages/RecordDetailPage';
 import FavoritesPage from '@/pages/FavoritesPage';
+import CityMapPage from '@/pages/CityMapPage';
 import NavBar from '@/components/layout/NavBar';
 import FilmGrain, { FilmScratches } from '@/components/layout/FilmGrain';
 import WarmLightOverlay from '@/components/layout/WarmLight';
@@ -16,6 +17,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/map" element={<CityMapPage />} />
             <Route path="/shelves/:mood" element={<ShelfPage />} />
             <Route path="/record/:id" element={<RecordDetailPage />} />
             <Route path="/favorites" element={<FavoritesPage />} />
