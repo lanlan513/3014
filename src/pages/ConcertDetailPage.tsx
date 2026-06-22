@@ -16,14 +16,15 @@ import {
   Info,
 } from 'lucide-react';
 import {
-  getConcertById,
   getTourById,
   getStageDesignById,
   getCityById,
   getConcertsByTourId,
   getConcertsByCityId,
 } from '@/data/concerts';
+import { getConcertById } from '@/data/concerts/index';
 import { getMoodById } from '@/data/moods';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const ConcertDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,6 +35,7 @@ const ConcertDetailPage = () => {
   const mood = concert ? getMoodById(concert.mood) : undefined;
   const tourConcerts = concert ? getConcertsByTourId(concert.tourId).filter((c) => c.id !== concert.id).slice(0, 4) : [];
   const cityConcerts = concert ? getConcertsByCityId(concert.cityId).filter((c) => c.id !== concert.id).slice(0, 4) : [];
+  const { animationEnabled } = usePerformanceMode();
 
   if (!concert || !tour || !mood) {
     return (
@@ -64,6 +66,21 @@ const ConcertDetailPage = () => {
 
   return (
     <div className="relative min-h-screen pt-24 pb-20">
+      <style>
+        {`
+          @keyframes cover-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+          }
+          .cover-float {
+            animation-play-state: ${animationEnabled ? 'running' : 'paused'};
+            animation: cover-float 5s ease-in-out infinite;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .cover-float { animation: none !important; }
+          }
+        `}
+      </style>
       <div
         className="fixed inset-0 -z-10"
         style={{
@@ -116,17 +133,9 @@ const ConcertDetailPage = () => {
               >
                 <div className="relative mx-auto max-w-xs">
                   <motion.div
-                    className="aspect-square rounded-2xl overflow-hidden shadow-2xl relative"
+                    className="aspect-square rounded-2xl overflow-hidden shadow-2xl relative cover-float"
                     style={{
                       background: `linear-gradient(135deg, ${concert.coverColors[0]} 0%, ${concert.coverColors[1]} 100%)`,
-                    }}
-                    animate={{
-                      y: [0, -8, 0],
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
                     }}
                   >
                     <div

@@ -1,0 +1,53 @@
+import type { Album } from '../albums';
+
+export const albumDetail: Album = {
+    id: 'qi',
+    title: '七',
+    artist: '陈奕迅',
+    year: 2003,
+    month: 11,
+    coverEmoji: '7️⃣',
+    coverColors: ['#8e44ad', '#9b59b6'],
+    primaryMood: 'reunion',
+    recordLabel: '英皇娱乐',
+    language: '国语',
+    totalTracks: 18,
+    totalDuration: '75:30',
+    tracks: [
+      { id: 'qi-1', title: '圣诞结', duration: '4:12' },
+      { id: 'qi-2', title: 'Shall We Talk (国)', duration: '3:48' },
+      { id: 'qi-3', title: '寂寞让你更快乐', duration: '4:05' },
+      { id: 'qi-4', title: '淘汰', duration: '4:35' },
+      { id: 'qi-5', title: '十年', duration: '3:25' },
+      { id: 'qi-6', title: 'K歌之王 (国)', duration: '3:32' },
+      { id: 'qi-7', title: '想哭', duration: '4:28' },
+      { id: 'qi-8', title: '爱是怀疑', duration: '4:12' },
+      { id: 'qi-9', title: '婚礼的祝福', duration: '4:02' },
+      { id: 'qi-10', title: '谢谢', duration: '4:05' },
+      { id: 'qi-11', title: '预感', duration: '3:52' },
+      { id: 'qi-12', title: '要你的', duration: '4:18' },
+      { id: 'qi-13', title: '不如这样', duration: '4:38' },
+      { id: 'qi-14', title: '全世界失眠', duration: '4:05' },
+      { id: 'qi-15', title: '兄妹', duration: '4:12' },
+      { id: 'qi-16', title: '没有你', duration: '3:52' },
+      { id: 'qi-17', title: '时代曲', duration: '3:52' },
+      { id: 'qi-18', title: '我们都寂寞', duration: '3:42' },
+    ],
+    productionTeam: [
+      { role: '制作人', name: '陈小霞、林夕' },
+      { role: '作曲', name: '陈小霞、陈辉阳等' },
+      { role: '作词', name: '林夕、施立等' },
+      { role: '编曲', name: '陈辉阳、刘志远等' },
+    ],
+    backgroundStory:
+      '《七》是陈奕迅2003年发行的国语新歌+精选专辑，专辑名称"七"寓意"完美"，因为"七"在很多文化中都是幸运数字。这张专辑收录了18首歌曲，包括3首新歌和15首精选，涵盖了陈奕迅在华星和英皇时期的经典国语作品。其中《圣诞结》由李焯雄作词、李峻一作曲，以圣诞节为背景，讲述了孤独的节日心情，成为陈奕迅最经典的国语歌曲之一。这张专辑也是陈奕迅在英皇娱乐时期的一张重要作品集。',
+    criticalReception:
+      '《七》获得了广泛好评，《圣诞结》成为了每年圣诞节必播的经典歌曲。专辑在全亚洲销量突破150万张，商业成绩斐然。评论家认为，这张精选集完美展现了陈奕迅在国语歌曲上的实力和成就，是他国语音乐生涯的重要里程碑。新歌《圣诞结》更是成为了华语乐坛的圣诞经典。',
+    funFacts: [
+      '专辑名称"七"寓意完美，是陈奕迅最喜欢的数字之一',
+      '《圣诞结》每年圣诞节都会在各大音乐平台重新火起来',
+      '这张专辑收录了陈奕迅在华星和英皇时期的经典国语作品',
+    ],
+    relatedAlbumIds: ['hei-bai-hui', 'ren-le-ba'],
+    eraNote: '2003年，《七》正式发行，《圣诞结》成为了永远的圣诞经典。',
+  };

@@ -5,15 +5,18 @@ import LocationModal from '@/components/map/LocationModal';
 import { cityThemes, mapLocations, getThemeByTime, streets } from '@/data/cityMap';
 import type { CityTheme, MapLocation } from '@/data/cityMap';
 import { getMoodById, moods } from '@/data/moods';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const MapPinComponent = ({
   location,
   onClick,
   theme,
+  animationEnabled,
 }: {
   location: MapLocation;
   onClick: () => void;
   theme: CityTheme;
+  animationEnabled: boolean;
 }) => {
   const mood = getMoodById(location.mood);
   const [hovered, setHovered] = useState(false);
@@ -32,14 +35,20 @@ const MapPinComponent = ({
         transition={{ type: 'spring', damping: 15, stiffness: 200 }}
       >
         {isNight && (
-          <motion.circle
+          <circle
             cx={location.x}
             cy={location.y - 10}
             r={hovered ? 35 : 25}
             fill={mood?.neonColor}
-            opacity={glowIntensity * 0.4}
-            animate={{ opacity: [glowIntensity * 0.3, glowIntensity * 0.5, glowIntensity * 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
+            className="map-pin-glow"
+            style={
+              animationEnabled
+                ? ({
+                    ['--glow-opacity' as any]: glowIntensity * 0.4,
+                    animationPlayState: 'running',
+                  } as React.CSSProperties)
+                : { opacity: glowIntensity * 0.4 }
+            }
           />
         )}
         <motion.circle
@@ -196,6 +205,7 @@ export default function CityMapPage() {
   const [themeIndex, setThemeIndex] = useState<number>(3);
   const [autoTheme, setAutoTheme] = useState(true);
   const [showLegend, setShowLegend] = useState(true);
+  const { isLowPerf, animationEnabled } = usePerformanceMode();
 
   const currentTheme: CityTheme = useMemo(() => cityThemes[themeIndex], [themeIndex]);
 
@@ -255,6 +265,37 @@ export default function CityMapPage() {
 
   return (
     <div className="min-h-screen pt-20 pb-10 px-4">
+      <style>{`
+        @keyframes twinkle-star {
+          0%, 100% { opacity: 0.3; }
+          50% { opacity: 0.8; }
+        }
+        @keyframes map-pin-glow {
+          0%, 100% { opacity: calc(var(--glow-opacity, 0.4) * 0.75); }
+          50% { opacity: calc(var(--glow-opacity, 0.4) * 1.25); }
+        }
+        .twinkle-star {
+          animation-name: twinkle-star;
+          animation-duration: var(--duration, 2s);
+          animation-delay: var(--delay, 0s);
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+        }
+        .map-pin-glow {
+          animation-name: map-pin-glow;
+          animation-duration: 2s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          animation-direction: alternate;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .twinkle-star,
+          .map-pin-glow {
+            animation: none !important;
+          }
+          .twinkle-star { opacity: 0.6 !important; }
+        }
+      `}</style>
       <div className="max-w-6xl mx-auto">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-8">
           <h1 className="font-display text-4xl md:text-5xl text-warm-100 mb-3">
@@ -403,20 +444,29 @@ export default function CityMapPage() {
 
             {currentTheme.name !== 'day' && (
               <g opacity={currentTheme.name === 'night' ? 0.8 : 0.4}>
-                {Array.from({ length: 50 }).map((_, i) => {
+                {Array.from({ length: isLowPerf ? 18 : 50 }).map((_, i) => {
                   const sx = (i * 137) % 900;
                   const sy = (i * 73) % 250;
                   const size = ((i * 17) % 3) + 1;
+                  const duration = 2 + (i % 3);
+                  const delay = i * 0.1;
                   return (
-                    <motion.circle
+                    <circle
                       key={i}
                       cx={sx}
                       cy={sy}
                       r={size}
                       fill="#f5e6c8"
-                      opacity={0.6}
-                      animate={{ opacity: [0.3, 0.8, 0.3] }}
-                      transition={{ duration: 2 + (i % 3), repeat: Infinity, delay: i * 0.1 }}
+                      className="twinkle-star"
+                      style={
+                        animationEnabled
+                          ? ({
+                              ['--duration' as any]: `${duration}s`,
+                              ['--delay' as any]: `${delay}s`,
+                              animationPlayState: 'running',
+                            } as React.CSSProperties)
+                          : { opacity: 0.6 }
+                      }
                     />
                   );
                 })}
@@ -517,6 +567,7 @@ export default function CityMapPage() {
                 key={location.id}
                 location={location}
                 theme={currentTheme}
+                animationEnabled={animationEnabled}
                 onClick={() => setSelectedLocation(location)}
               />
             ))}

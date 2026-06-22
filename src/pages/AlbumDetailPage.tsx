@@ -18,6 +18,7 @@ import {
 import { getAlbumById, getRelatedAlbums } from '@/data/albums';
 import { getMoodById } from '@/data/moods';
 import AlbumCover from '@/components/album/AlbumCover';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const AlbumDetailPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,7 @@ const AlbumDetailPage = () => {
   const album = getAlbumById(id || '');
   const mood = album ? getMoodById(album.primaryMood) : undefined;
   const relatedAlbums = album ? getRelatedAlbums(album.id, 4) : [];
+  const { animationEnabled } = usePerformanceMode();
 
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
 
@@ -48,6 +50,31 @@ const AlbumDetailPage = () => {
 
   return (
     <div className="relative min-h-screen pt-24 pb-20">
+      <style>
+        {`
+          @keyframes cover-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+          }
+          @keyframes vinyl-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          @keyframes play-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+          }
+          .cover-float, .vinyl-spin, .play-pulse {
+            animation-play-state: ${animationEnabled ? 'running' : 'paused'};
+          }
+          .cover-float { animation: cover-float 5s ease-in-out infinite; }
+          .vinyl-spin { animation: vinyl-spin 12s linear infinite; }
+          .play-pulse { animation: play-pulse 0.8s ease-in-out infinite; }
+          @media (prefers-reduced-motion: reduce) {
+            .cover-float, .vinyl-spin, .play-pulse { animation: none !important; }
+          }
+        `}
+      </style>
       <div
         className="fixed inset-0 -z-10"
         style={{
@@ -90,17 +117,9 @@ const AlbumDetailPage = () => {
               <div className="relative mx-auto max-w-sm">
                 <div className="relative aspect-square max-w-[280px] md:max-w-none mx-auto">
                   <motion.div
-                    className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl"
+                    className="absolute inset-0 rounded-2xl overflow-hidden shadow-2xl cover-float"
                     style={{
                       background: `linear-gradient(135deg, ${album.coverColors[0]} 0%, ${album.coverColors[1]} 100%)`,
-                    }}
-                    animate={{
-                      y: [0, -8, 0],
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: 'easeInOut',
                     }}
                   >
                     <div
@@ -129,13 +148,7 @@ const AlbumDetailPage = () => {
                   </motion.div>
 
                   <motion.div
-                    className="absolute -right-4 top-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full vinyl-record opacity-60"
-                    animate={{ rotate: 360 }}
-                    transition={{
-                      duration: 12,
-                      repeat: Infinity,
-                      ease: 'linear',
-                    }}
+                    className="absolute -right-4 top-1/2 -translate-y-1/2 w-[60%] aspect-square rounded-full vinyl-record opacity-60 vinyl-spin"
                     style={{ zIndex: -1, boxShadow: '0 0 40px rgba(0,0,0,0.7)' }}
                   >
                     <div className="absolute inset-[35%] rounded-full vinyl-label flex items-center justify-center">
@@ -291,13 +304,11 @@ const AlbumDetailPage = () => {
                     >
                       <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
                         {playingTrackId === track.id ? (
-                          <motion.div
-                            animate={{ scale: [1, 1.2, 1] }}
-                            transition={{ duration: 0.8, repeat: Infinity }}
-                            className="text-warm-300"
+                          <div
+                            className="play-pulse text-warm-300"
                           >
                             <Play size={16} fill="currentColor" />
-                          </motion.div>
+                          </div>
                         ) : (
                           <span className="font-hand text-warm-200/40 text-sm">
                             {String(index + 1).padStart(2, '0')}

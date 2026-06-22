@@ -3,10 +3,12 @@ import { motion } from 'framer-motion';
 import { Search, Play, Clock, Music, Star, Heart } from 'lucide-react';
 import { liveClips, type LiveClip } from '@/data/concerts';
 import { moods, getMoodById, type MoodId } from '@/data/moods';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const LiveClipsPage = () => {
   const [selectedMood, setSelectedMood] = useState<MoodId | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const { animationEnabled } = usePerformanceMode();
 
   const filteredClips = useMemo(() => {
     return liveClips.filter((clip) => {
@@ -36,6 +38,22 @@ const LiveClipsPage = () => {
 
   return (
     <div className="relative min-h-screen pt-24 pb-20">
+      <style>
+        {`
+          @keyframes clip-breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+          }
+          .clip-breathe {
+            animation-play-state: ${animationEnabled ? 'running' : 'paused'};
+            animation: clip-breathe 3s ease-in-out infinite;
+            animation-delay: var(--delay, 0s);
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .clip-breathe { animation: none !important; }
+          }
+        `}
+      </style>
       <div
         className="fixed inset-0 -z-10 opacity-60"
         style={{
@@ -216,16 +234,8 @@ const LiveClipCard = ({ clip, index }: { clip: LiveClip; index: number }) => {
             }}
           >
             <motion.div
-              className="text-6xl md:text-7xl"
-              animate={{
-                scale: [1, 1.05, 1],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: index * 0.1,
-              }}
+              className="text-6xl md:text-7xl clip-breathe"
+              style={{ ['--delay' as any]: `${index * 0.1}s` }}
             >
               {clip.thumbnail}
             </motion.div>

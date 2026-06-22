@@ -1,10 +1,27 @@
 import { motion } from 'framer-motion';
 import NeonSign from '@/components/layout/NeonSign';
 import { Clock, Coffee, Music2 } from 'lucide-react';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const StoreFront = () => {
+  const { animationEnabled, isLowPerf } = usePerformanceMode();
   return (
-    <section className="relative min-h-[100vh] pt-20 pb-16 overflow-hidden">
+    <>
+      <style>{`
+        @keyframes vinyl-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        .vinyl-spin {
+          animation: vinyl-spin 12s linear infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .vinyl-spin {
+            animation: none;
+          }
+        }
+      `}</style>
+      <section className="relative min-h-[100vh] pt-20 pb-16 overflow-hidden">
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
           className="absolute top-[15%] left-[5%] text-[8px] md:text-xs font-hand"
@@ -130,9 +147,7 @@ const StoreFront = () => {
                     style={{ boxShadow: '0 0 60px rgba(244, 197, 66, 0.3)' }}
                   >
                     <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
-                      className="w-full h-full rounded-full relative"
+                      className={`w-full h-full rounded-full relative ${animationEnabled && !isLowPerf ? 'vinyl-spin' : ''}`}
                     >
                       <div className="absolute inset-[35%] rounded-full vinyl-label flex items-center justify-center">
                         <Coffee size={20} className="text-night-500 md:w-8 md:h-8 md:size-8" />
@@ -185,6 +200,7 @@ const StoreFront = () => {
         </motion.div>
       </div>
     </section>
+    </>
   );
 };
 

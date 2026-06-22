@@ -10,8 +10,10 @@ import {
   getCityById,
 } from '@/data/concerts';
 import { getMoodById } from '@/data/moods';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const ConcertTourPage = () => {
+  const { isLowPerf, animationEnabled } = usePerformanceMode();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const initialTourId = searchParams.get('tour') || concertTours[0].id;
@@ -530,6 +532,62 @@ const ConcertTourPage = () => {
                         '0 0 40px rgba(78, 205, 196, 0.1), inset 0 0 60px rgba(30, 40, 80, 0.2)',
                     }}
                   >
+                    <style>{`
+                      @keyframes star-twinkle {
+                        0%, 100% { opacity: 0.2; }
+                        50% { opacity: 0.6; }
+                      }
+                      @keyframes wave-pulse {
+                        0%, 100% { transform: scale(1); opacity: 0.1; }
+                        50% { transform: scale(1.1); opacity: 0.25; }
+                      }
+                      @keyframes city-glow-outer {
+                        0%, 100% { transform: scale(1); opacity: 0.3; }
+                        50% { transform: scale(1.3); opacity: 0.1; }
+                      }
+                      @keyframes city-glow-middle {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.15); }
+                      }
+                      @keyframes city-glow-inner {
+                        0%, 100% { transform: scale(1); }
+                        50% { transform: scale(1.1); }
+                      }
+                      .animate-star {
+                        animation: star-twinkle var(--duration, 2s) ease-in-out var(--delay, 0s) infinite;
+                        transform-origin: center;
+                        transform-box: fill-box;
+                      }
+                      .animate-wave {
+                        animation: wave-pulse var(--duration, 4s) ease-in-out var(--delay, 0s) infinite;
+                        transform-origin: center;
+                        transform-box: fill-box;
+                      }
+                      .animate-glow-outer {
+                        animation: city-glow-outer 1.5s ease-in-out infinite;
+                        transform-origin: center;
+                        transform-box: fill-box;
+                      }
+                      .animate-glow-middle {
+                        animation: city-glow-middle 2s ease-in-out infinite;
+                        transform-origin: center;
+                        transform-box: fill-box;
+                      }
+                      .animate-glow-inner {
+                        animation: city-glow-inner 1.5s ease-in-out infinite;
+                        transform-origin: center;
+                        transform-box: fill-box;
+                      }
+                      @media (prefers-reduced-motion: reduce) {
+                        .animate-star,
+                        .animate-wave,
+                        .animate-glow-outer,
+                        .animate-glow-middle,
+                        .animate-glow-inner {
+                          animation: none !important;
+                        }
+                      }
+                    `}</style>
                     <svg viewBox="0 0 1000 550" className="w-full h-auto" style={{ display: 'block' }}>
                       <defs>
                         <linearGradient id="oceanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -570,24 +628,23 @@ const ConcertTourPage = () => {
                       <rect x="0" y="0" width="1000" height="550" fill="url(#oceanGradient)" />
 
                       <g opacity="0.4">
-                        {Array.from({ length: 40 }).map((_, i) => {
+                        {Array.from({ length: isLowPerf ? 15 : 40 }).map((_, i) => {
                           const sx = (i * 157) % 1000;
                           const sy = (i * 89) % 300;
                           const size = ((i * 13) % 2) + 1;
                           return (
-                            <motion.circle
+                            <circle
                               key={i}
                               cx={sx}
                               cy={sy}
                               r={size}
                               fill="#f5e6c8"
                               opacity={0.5}
-                              animate={{ opacity: [0.2, 0.6, 0.2] }}
-                              transition={{
-                                duration: 2 + (i % 4),
-                                repeat: Infinity,
-                                delay: i * 0.08,
-                              }}
+                              className={animationEnabled ? 'animate-star' : ''}
+                              style={{
+                                '--duration': `${2 + (i % 4)}s`,
+                                '--delay': `${i * 0.08}s`,
+                              } as React.CSSProperties}
                             />
                           );
                         })}
@@ -602,11 +659,11 @@ const ConcertTourPage = () => {
                       </g>
 
                       <g opacity="0.3">
-                        {Array.from({ length: 30 }).map((_, i) => {
+                        {Array.from({ length: isLowPerf ? 10 : 30 }).map((_, i) => {
                           const sx = (i * 173 + 50) % 1000;
                           const sy = 320 + ((i * 97) % 200);
                           return (
-                            <motion.circle
+                            <circle
                               key={`wave-${i}`}
                               cx={sx}
                               cy={sy}
@@ -615,15 +672,11 @@ const ConcertTourPage = () => {
                               stroke="#4ecdc4"
                               strokeWidth="0.5"
                               opacity={0.15}
-                              animate={{
-                                scale: [1, 1.1, 1],
-                                opacity: [0.1, 0.25, 0.1],
-                              }}
-                              transition={{
-                                duration: 4,
-                                repeat: Infinity,
-                                delay: i * 0.2,
-                              }}
+                              className={animationEnabled ? 'animate-wave' : ''}
+                              style={{
+                                '--duration': '4s',
+                                '--delay': `${i * 0.2}s`,
+                              } as React.CSSProperties}
                             />
                           );
                         })}
@@ -655,36 +708,23 @@ const ConcertTourPage = () => {
                               }}
                             >
                               {isHighlighted && (
-                                <motion.circle
+                                <circle
                                   cx={city.mapX}
                                   cy={city.mapY}
                                   r={50}
                                   fill={glowColor}
                                   opacity={0.3}
-                                  animate={{
-                                    scale: [1, 1.3, 1],
-                                    opacity: [0.3, 0.1, 0.3],
-                                  }}
-                                  transition={{
-                                    duration: 1.5,
-                                    repeat: Infinity,
-                                  }}
+                                  className={animationEnabled ? 'animate-glow-outer' : ''}
                                 />
                               )}
 
-                              <motion.circle
+                              <circle
                                 cx={city.mapX}
                                 cy={city.mapY}
                                 r={isHighlighted ? 28 : 18}
                                 fill={glowColor}
                                 opacity={isHighlighted ? 0.35 : 0.2}
-                                animate={{
-                                  scale: isHighlighted ? [1, 1.15, 1] : 1,
-                                }}
-                                transition={{
-                                  duration: 2,
-                                  repeat: Infinity,
-                                }}
+                                className={isHighlighted && animationEnabled ? 'animate-glow-middle' : ''}
                               />
 
                               <motion.circle
@@ -695,13 +735,7 @@ const ConcertTourPage = () => {
                                 stroke={glowColor}
                                 strokeWidth={isHighlighted ? 3 : 2}
                                 whileHover={{ r: 14 }}
-                                animate={{
-                                  scale: isHighlighted ? [1, 1.1, 1] : 1,
-                                }}
-                                transition={{
-                                  duration: 1.5,
-                                  repeat: Infinity,
-                                }}
+                                className={isHighlighted && animationEnabled ? 'animate-glow-inner' : ''}
                                 style={{
                                   filter: isHighlighted
                                     ? `drop-shadow(0 0 12px ${glowColor})`

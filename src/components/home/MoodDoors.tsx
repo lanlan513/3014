@@ -2,10 +2,43 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { moods } from '@/data/moods';
 import { getRecordsByMood } from '@/data/records';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 const MoodDoors = () => {
+  const { animationEnabled, isLowPerf } = usePerformanceMode();
   return (
-    <section id="shelves" className="relative py-16 md:py-24">
+    <>
+      <style>{`
+        @keyframes mood-float {
+          0%, 100% {
+            transform: translateY(0) translateX(0) scale(1);
+          }
+          50% {
+            transform: translateY(-6px) translateX(0) scale(1.05);
+          }
+        }
+        .mood-float {
+          animation: mood-float 4s ease-in-out infinite;
+        }
+        @keyframes mood-neon-glow {
+          0%, 100% {
+            text-shadow: 0 0 10px var(--neon-color)99, 0 0 20px var(--neon-color)66;
+          }
+          50% {
+            text-shadow: 0 0 16px var(--neon-color)bb, 0 0 32px var(--neon-color)99;
+          }
+        }
+        .mood-neon-glow {
+          animation: mood-neon-glow 2.5s ease-in-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .mood-float,
+          .mood-neon-glow {
+            animation: none;
+          }
+        }
+      `}</style>
+      <section id="shelves" className="relative py-16 md:py-24">
       <div className="container max-w-6xl">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -87,39 +120,20 @@ const MoodDoors = () => {
 
                       <div className="relative pt-6 md:pt-8 flex flex-col items-center text-center h-full">
                         <motion.div
-                          className="text-5xl md:text-7xl mb-4 md:mb-6"
-                          animate={{
-                            y: [0, -6, 0],
-                            scale: [1, 1.05, 1],
-                          }}
-                          transition={{
-                            duration: 4,
-                            delay: i * 0.3,
-                            repeat: Infinity,
-                            ease: 'easeInOut',
-                          }}
+                          className={`text-5xl md:text-7xl mb-4 md:mb-6 ${animationEnabled && !isLowPerf ? 'mood-float' : ''}`}
+                          style={{ animationDelay: `${i * 0.3}s` }}
                         >
                           {mood.emoji}
                         </motion.div>
 
                         <motion.div
-                          className="font-display text-2xl md:text-3xl mb-2 md:mb-3 tracking-wider"
+                          className={`font-display text-2xl md:text-3xl mb-2 md:mb-3 tracking-wider ${animationEnabled && !isLowPerf ? 'mood-neon-glow' : ''}`}
                           style={{
                             color: mood.neonColor,
                             textShadow: `0 0 10px ${mood.neonColor}99, 0 0 20px ${mood.neonColor}66`,
-                          }}
-                          animate={{
-                            textShadow: [
-                              `0 0 10px ${mood.neonColor}99, 0 0 20px ${mood.neonColor}66`,
-                              `0 0 16px ${mood.neonColor}bb, 0 0 32px ${mood.neonColor}99`,
-                              `0 0 10px ${mood.neonColor}99, 0 0 20px ${mood.neonColor}66`,
-                            ],
-                          }}
-                          transition={{
-                            duration: 2.5,
-                            delay: i * 0.2,
-                            repeat: Infinity,
-                          }}
+                            '--neon-color': mood.neonColor,
+                            animationDelay: `${i * 0.2}s`,
+                          } as React.CSSProperties}
                         >
                           {mood.name}
                         </motion.div>
@@ -173,6 +187,7 @@ const MoodDoors = () => {
         </motion.div>
       </div>
     </section>
+    </>
   );
 };
 

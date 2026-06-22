@@ -563,7 +563,7 @@ export default function MoodClusterPage() {
                           style={
                             moodFilter === segment.mood.id
                               ? {
-                                  ringColor: segment.mood.neonColor,
+                                  ['--tw-ring-color' as string]: segment.mood.neonColor,
                                   boxShadow: `0 0 12px ${segment.mood.neonColor}22`,
                                 }
                               : undefined

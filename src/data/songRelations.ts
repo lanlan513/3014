@@ -1,5 +1,5 @@
 import type { MoodId } from './moods';
-import type { Record } from './records';
+import type { Record as MusicRecord } from './records';
 import { records } from './records';
 
 export type MusicStyle =
@@ -12,7 +12,8 @@ export type MusicStyle =
   | 'Jazz'
   | 'Orchestral'
   | 'Acoustic'
-  | 'Folk';
+  | 'Folk'
+  | 'Pop';
 
 export type SongTheme =
   | '失恋'
@@ -556,7 +557,7 @@ export const getSongById = (id: string): SongDetail | undefined => {
 };
 
 export const getAllLyricists = (): { name: string; count: number; color: string }[] => {
-  const map: Record<string, number> = {};
+  const map: { [k: string]: number } = {};
   songDetails.forEach((s) => {
     map[s.lyricist] = (map[s.lyricist] || 0) + 1;
   });
@@ -567,7 +568,7 @@ export const getAllLyricists = (): { name: string; count: number; color: string 
 };
 
 export const getAllComposers = (): { name: string; count: number; color: string }[] => {
-  const map: Record<string, number> = {};
+  const map: { [k: string]: number } = {};
   songDetails.forEach((s) => {
     map[s.composer] = (map[s.composer] || 0) + 1;
   });
@@ -578,7 +579,7 @@ export const getAllComposers = (): { name: string; count: number; color: string 
 };
 
 export const getAllAlbums = (): { name: string; year: number; count: number; songs: SongDetail[] }[] => {
-  const map: Record<string, SongDetail[]> = {};
+  const map: { [k: string]: SongDetail[] } = {};
   songDetails.forEach((s) => {
     if (!map[s.album]) map[s.album] = [];
     map[s.album].push(s);
@@ -594,13 +595,13 @@ export const getAllAlbums = (): { name: string; year: number; count: number; son
 };
 
 export const getAllStyles = (): { name: MusicStyle; count: number; color: string }[] => {
-  const map: Record<MusicStyle, number> = {} as Record<MusicStyle, number>;
+  const map: { [k in MusicStyle]?: number } = {};
   songDetails.forEach((s) => {
     s.style.forEach((st) => {
       map[st] = (map[st] || 0) + 1;
     });
   });
-  const colors: Record<MusicStyle, string> = {
+  const colors: { [k in MusicStyle]: string } = {
     Cantopop: '#f4c542',
     Mandopop: '#ff6b9d',
     Ballad: '#4ecdc4',
@@ -612,7 +613,9 @@ export const getAllStyles = (): { name: MusicStyle; count: number; color: string
     Acoustic: '#22c55e',
     Folk: '#84cc16',
     RnB: '#a855f7',
-  };
+    Pop: '#ec4899',
+    'R&B': '#a855f7',
+  } as { [k in MusicStyle]: string };
   return Object.entries(map)
     .map(([name, count]) => ({
       name: name as MusicStyle,
@@ -623,7 +626,7 @@ export const getAllStyles = (): { name: MusicStyle; count: number; color: string
 };
 
 export const getAllThemes = (): { name: SongTheme; count: number; color: string }[] => {
-  const map: Record<SongTheme, number> = {} as Record<SongTheme, number>;
+  const map: { [k in SongTheme]?: number } = {};
   songDetails.forEach((s) => {
     s.themes.forEach((t) => {
       map[t] = (map[t] || 0) + 1;
@@ -693,8 +696,8 @@ export const buildSongGraph = (): { nodes: GraphNode[]; edges: GraphEdge[] } => 
   const nodes: Map<string, GraphNode> = new Map();
   const edges: GraphEdge[] = [];
 
-  const lyricistColors: Record<string, string> = {};
-  const composerColors: Record<string, string> = {};
+  const lyricistColors: { [k: string]: string } = {};
+  const composerColors: { [k: string]: string } = {};
   const lColors = ['#ff6b9d', '#f97316', '#ec4899', '#fb7185'];
   const cColors = ['#4ecdc4', '#22d3ee', '#06b6d4', '#0891b2'];
   let lIdx = 0;
@@ -770,7 +773,7 @@ export const buildSongGraph = (): { nodes: GraphNode[]; edges: GraphEdge[] } => 
 
     song.style.forEach((st) => {
       if (!nodes.has(`style-${st}`)) {
-        const stColors: Record<string, string> = {
+        const stColors: { [k: string]: string } = {
           Cantopop: '#f4c542',
           Mandopop: '#ff6b9d',
           Ballad: '#4ecdc4',
@@ -782,6 +785,7 @@ export const buildSongGraph = (): { nodes: GraphNode[]; edges: GraphEdge[] } => 
           Orchestral: '#8b5cf6',
           Acoustic: '#22c55e',
           Folk: '#84cc16',
+          Pop: '#ec4899',
         };
         nodes.set(`style-${st}`, {
           id: `style-${st}`,
@@ -942,7 +946,5 @@ songDetails.forEach((song) => {
   });
 });
 
-export const { getRecordsByMood: _orig } = { getRecordsByMood: null as unknown as typeof null };
-export type { Record as _R };
-void _orig;
-void records;
+// 占位引用，避免 TS unused 警告
+void (0 as unknown as MusicRecord | undefined);
