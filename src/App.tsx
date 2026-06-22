@@ -7,6 +7,10 @@ import FavoritesPage from '@/pages/FavoritesPage';
 import CityMapPage from '@/pages/CityMapPage';
 import AlbumTimelinePage from '@/pages/AlbumTimelinePage';
 import AlbumDetailPage from '@/pages/AlbumDetailPage';
+import ConcertTourPage from '@/pages/ConcertTourPage';
+import ConcertDetailPage from '@/pages/ConcertDetailPage';
+import LiveClipsPage from '@/pages/LiveClipsPage';
+import ConcertStatsPage from '@/pages/ConcertStatsPage';
 import NavBar from '@/components/layout/NavBar';
 import FilmGrain, { FilmScratches } from '@/components/layout/FilmGrain';
 import WarmLightOverlay from '@/components/layout/WarmLight';
@@ -25,6 +29,10 @@ export default function App() {
             <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/albums" element={<AlbumTimelinePage />} />
             <Route path="/album/:id" element={<AlbumDetailPage />} />
+            <Route path="/concerts" element={<ConcertTourPage />} />
+            <Route path="/concert/:id" element={<ConcertDetailPage />} />
+            <Route path="/live-clips" element={<LiveClipsPage />} />
+            <Route path="/concert-stats" element={<ConcertStatsPage />} />
             <Route
               path="*"
               element={

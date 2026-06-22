@@ -81,6 +81,16 @@ body {
     box-shadow: 0 0 10px rgba(78, 205, 196, 0.5), inset 0 0 10px rgba(78, 205, 196, 0.1);
   }
 
+  .text-neon-purple {
+    color: #a855f7;
+    text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 40px #a855f7;
+  }
+
+  .border-neon-purple {
+    border-color: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5), inset 0 0 10px rgba(168, 85, 247, 0.1);
+  }
+
   .glass-panel {
     background: linear-gradient(135deg, rgba(26, 20, 16, 0.9), rgba(13, 10, 8, 0.95));
     backdrop-filter: blur(10px);

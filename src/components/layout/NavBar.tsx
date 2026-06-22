@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Disc3, Heart, Map, Disc } from 'lucide-react';
+import { Home, Disc3, Heart, Map, Disc, Mic2, PlayCircle, BarChart3 } from 'lucide-react';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { moods } from '@/data/moods';
 
@@ -76,6 +76,43 @@ const NavBar = () => {
               >
                 <Disc size={16} />
                 <span className="hidden md:inline">专辑</span>
+              </Link>
+
+              <Link
+                to="/concerts"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/concert') && !location.pathname.startsWith('/concert-stats')
+                    ? 'bg-neon-warm/20 text-neon-warm border border-neon-warm/30'
+                    : 'text-warm-100/70 hover:text-neon-warm hover:bg-neon-warm/10'
+                }`}
+              >
+                <Mic2 size={16} />
+                <span className="hidden md:inline">演唱会</span>
+              </Link>
+
+              <Link
+                to="/live-clips"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/live-clips')
+                    ? 'bg-neon-cyan/20 text-neon-cyan border border-neon-cyan/30'
+                    : 'text-warm-100/70 hover:text-neon-cyan hover:bg-neon-cyan/10'
+                }`}
+              >
+                <PlayCircle size={16} />
+                <span className="hidden md:inline">现场</span>
+              </Link>
+
+              <Link
+                to="/concert-stats"
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/concert-stats')
+                    ? 'bg-neon-purple/20 border border-neon-purple/30'
+                    : 'text-warm-100/70 hover:bg-neon-purple/10'
+                }`}
+                style={location.pathname.startsWith('/concert-stats') ? { color: '#a855f7' } : {}}
+              >
+                <BarChart3 size={16} />
+                <span className="hidden md:inline">统计</span>
               </Link>
 
               <div className="hidden sm:flex items-center gap-0.5">
