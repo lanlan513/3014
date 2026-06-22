@@ -1,29 +1,39 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import HomePage from '@/pages/HomePage';
-import ShelfPage from '@/pages/ShelfPage';
-import RecordDetailPage from '@/pages/RecordDetailPage';
-import FavoritesPage from '@/pages/FavoritesPage';
-import CityMapPage from '@/pages/CityMapPage';
-import AlbumTimelinePage from '@/pages/AlbumTimelinePage';
-import AlbumDetailPage from '@/pages/AlbumDetailPage';
-import ConcertTourPage from '@/pages/ConcertTourPage';
-import ConcertDetailPage from '@/pages/ConcertDetailPage';
-import LiveClipsPage from '@/pages/LiveClipsPage';
-import ConcertStatsPage from '@/pages/ConcertStatsPage';
-import SongGraphPage from '@/pages/SongGraphPage';
-import StyleEvolutionPage from '@/pages/StyleEvolutionPage';
-import MoodClusterPage from '@/pages/MoodClusterPage';
+import { lazy, Suspense } from 'react';
 import NavBar from '@/components/layout/NavBar';
 import FilmGrain, { FilmScratches } from '@/components/layout/FilmGrain';
 import WarmLightOverlay from '@/components/layout/WarmLight';
+
+const HomePage = lazy(() => import('@/pages/HomePage'));
+const ShelfPage = lazy(() => import('@/pages/ShelfPage'));
+const RecordDetailPage = lazy(() => import('@/pages/RecordDetailPage'));
+const FavoritesPage = lazy(() => import('@/pages/FavoritesPage'));
+const CityMapPage = lazy(() => import('@/pages/CityMapPage'));
+const AlbumTimelinePage = lazy(() => import('@/pages/AlbumTimelinePage'));
+const AlbumDetailPage = lazy(() => import('@/pages/AlbumDetailPage'));
+const ConcertTourPage = lazy(() => import('@/pages/ConcertTourPage'));
+const ConcertDetailPage = lazy(() => import('@/pages/ConcertDetailPage'));
+const LiveClipsPage = lazy(() => import('@/pages/LiveClipsPage'));
+const ConcertStatsPage = lazy(() => import('@/pages/ConcertStatsPage'));
+const SongGraphPage = lazy(() => import('@/pages/SongGraphPage'));
+const StyleEvolutionPage = lazy(() => import('@/pages/StyleEvolutionPage'));
+const MoodClusterPage = lazy(() => import('@/pages/MoodClusterPage'));
+
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center pt-20">
+    <div className="text-center">
+      <div className="text-5xl mb-4 animate-warm-glow">🎵</div>
+      <div className="font-hand text-warm-200/60 text-lg">加载中...</div>
+    </div>
+  </div>
+);
 
 export default function App() {
   return (
     <Router>
       <div className="relative min-h-screen overflow-x-hidden">
         <NavBar />
-        <AnimatePresence mode="wait">
+        <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/map" element={<CityMapPage />} />
@@ -59,7 +69,7 @@ export default function App() {
               }
             />
           </Routes>
-        </AnimatePresence>
+        </Suspense>
 
         <WarmLightOverlay />
         <FilmGrain />

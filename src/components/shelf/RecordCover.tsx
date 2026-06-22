@@ -4,6 +4,7 @@ import { Disc, Music } from 'lucide-react';
 import type { Record } from '@/data/records';
 import { getMoodById } from '@/data/moods';
 import { useFavoritesStore } from '@/stores/favoritesStore';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 interface RecordCoverProps {
   record: Record;
@@ -14,6 +15,7 @@ interface RecordCoverProps {
 const RecordCover = ({ record, index = 0, size = 'md' }: RecordCoverProps) => {
   const mood = getMoodById(record.mood);
   const { isFavorite } = useFavoritesStore();
+  const { animationEnabled } = usePerformanceMode();
   const fav = isFavorite(record.id);
 
   const sizeClasses = {
@@ -74,20 +76,26 @@ const RecordCover = ({ record, index = 0, size = 'md' }: RecordCoverProps) => {
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center p-3 md:p-6">
-          <motion.div
-            className={`${emojiSizes[size]} mb-2 md:mb-4 drop-shadow-2xl`}
-            animate={{
-              y: [0, -4, 0],
-            }}
-            transition={{
-              duration: 3,
-              delay: index * 0.1,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+          <div
+            className={`${emojiSizes[size]} mb-2 md:mb-4 drop-shadow-2xl ${animationEnabled ? 'record-emoji-float' : ''}`}
+            style={{ animationDelay: `${index * 0.1}s` }}
           >
+            <style>
+              {`
+                @keyframes record-emoji-float {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(-4px); }
+                }
+                .record-emoji-float {
+                  animation: record-emoji-float 3s ease-in-out infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  .record-emoji-float { animation: none; }
+                }
+              `}
+            </style>
             {record.coverEmoji}
-          </motion.div>
+          </div>
 
           <div
             className={`font-display ${titleSizes[size]} text-white text-center leading-tight drop-shadow-lg`}

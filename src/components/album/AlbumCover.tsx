@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Disc, Music } from 'lucide-react';
 import type { Album } from '@/data/albums';
 import { getMoodById } from '@/data/moods';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 interface AlbumCoverProps {
   album: Album;
@@ -12,6 +13,7 @@ interface AlbumCoverProps {
 
 const AlbumCover = ({ album, index = 0, size = 'md' }: AlbumCoverProps) => {
   const mood = getMoodById(album.primaryMood);
+  const { animationEnabled } = usePerformanceMode();
 
   const sizeClasses = {
     sm: 'aspect-square',
@@ -71,20 +73,26 @@ const AlbumCover = ({ album, index = 0, size = 'md' }: AlbumCoverProps) => {
         />
 
         <div className="absolute inset-0 flex flex-col items-center justify-center p-4">
-          <motion.div
-            className={`${emojiSizes[size]} mb-3 drop-shadow-2xl`}
-            animate={{
-              y: [0, -5, 0],
-            }}
-            transition={{
-              duration: 3.5,
-              delay: index * 0.08,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
+          <div
+            className={`${emojiSizes[size]} mb-3 drop-shadow-2xl ${animationEnabled ? 'album-emoji-float' : ''}`}
+            style={{ animationDelay: `${index * 0.08}s` }}
           >
+            <style>
+              {`
+                @keyframes album-emoji-float {
+                  0%, 100% { transform: translateY(0); }
+                  50% { transform: translateY(-5px); }
+                }
+                .album-emoji-float {
+                  animation: album-emoji-float 3.5s ease-in-out infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                  .album-emoji-float { animation: none; }
+                }
+              `}
+            </style>
             {album.coverEmoji}
-          </motion.div>
+          </div>
 
           <div
             className={`font-display ${titleSizes[size]} text-white text-center leading-tight drop-shadow-lg`}

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Snowflake, Heart, Eye, EyeOff, Mountain, Wind } from 'lucide-react';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 export interface RegretCard {
   id: string;
@@ -129,39 +130,52 @@ const MountainPath = ({ isNight }: { isNight: boolean }) => {
   );
 };
 
-const FallingSnow = ({ isNight }: { isNight: boolean }) => {
+const FallingSnow = ({ isNight, count }: { isNight: boolean; count: number }) => {
   const snowflakes = useMemo(() => {
-    return Array.from({ length: 60 }).map((_, i) => ({
+    return Array.from({ length: count }).map((_, i) => ({
       id: i,
       x: Math.random() * 900,
-      y: Math.random() * 500,
+      startY: -20 - Math.random() * 500,
       size: Math.random() * 3 + 1,
-      speed: Math.random() * 2 + 1,
-      delay: Math.random() * 5,
+      duration: 8 + Math.random() * 7,
+      delay: Math.random() * 10,
+      swayAmount: 15 + Math.random() * 25,
     }));
-  }, []);
+  }, [count]);
+
+  const flakeColor = isNight ? '#ffffff' : '#e8eef5';
 
   return (
     <g>
+      <style>
+        {`
+          @keyframes snow-fall {
+            0% { transform: translate(0, 0); opacity: 0; }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.6; }
+            100% { transform: translate(var(--sway), 520px); opacity: 0; }
+          }
+          .snow-flake {
+            animation: snow-fall var(--duration) linear var(--delay) infinite;
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .snow-flake { animation: none; }
+          }
+        `}
+      </style>
       {snowflakes.map((flake) => (
-        <motion.circle
+        <circle
           key={flake.id}
           cx={flake.x}
-          cy={flake.y}
+          cy={flake.startY}
           r={flake.size}
-          fill={isNight ? '#ffffff' : '#e8eef5'}
-          opacity="0.8"
-          animate={{
-            y: [flake.y, flake.y + 500],
-            x: [flake.x, flake.x + Math.sin(flake.y * 0.01) * 30],
-            opacity: [0.8, 0.6, 0],
-          }}
-          transition={{
-            duration: 10 / flake.speed,
-            delay: flake.delay,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
+          fill={flakeColor}
+          className="snow-flake"
+          style={{
+            '--duration': `${flake.duration}s`,
+            '--delay': `${flake.delay}s`,
+            '--sway': `${flake.swayAmount}px`,
+          } as React.CSSProperties}
         />
       ))}
     </g>
@@ -588,6 +602,10 @@ export default function FujiSnowMountain({ isNight = true }: { isNight?: boolean
   const [showAllContent, setShowAllContent] = useState(false);
   const [climberPosition, setClimberPosition] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
+  const { isLowPerf, animationEnabled } = usePerformanceMode();
+
+  const snowCount = isLowPerf ? 20 : 60;
+  const starCount = isLowPerf ? 12 : 40;
 
   useEffect(() => {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -753,24 +771,36 @@ export default function FujiSnowMountain({ isNight = true }: { isNight?: boolean
 
           {isNight && (
             <g opacity="0.8">
-              {Array.from({ length: 40 }).map((_, i) => {
+              <style>
+                {`
+                  @keyframes star-twinkle {
+                    0%, 100% { opacity: 0.3; }
+                    50% { opacity: 0.8; }
+                  }
+                  .star-twinkle {
+                    animation: star-twinkle var(--duration) ease-in-out var(--delay) infinite;
+                  }
+                  @media (prefers-reduced-motion: reduce) {
+                    .star-twinkle { animation: none; opacity: 0.6; }
+                  }
+                `}
+              </style>
+              {Array.from({ length: starCount }).map((_, i) => {
                 const sx = (i * 137) % 900;
                 const sy = (i * 73) % 200;
                 const size = ((i * 17) % 3) + 1;
                 return (
-                  <motion.circle
+                  <circle
                     key={i}
                     cx={sx}
                     cy={sy}
                     r={size}
                     fill="#ffffff"
-                    opacity={0.6}
-                    animate={{ opacity: [0.3, 0.8, 0.3] }}
-                    transition={{
-                      duration: 2 + (i % 3),
-                      repeat: Infinity,
-                      delay: i * 0.1,
-                    }}
+                    className="star-twinkle"
+                    style={{
+                      '--duration': `${2 + (i % 3)}s`,
+                      '--delay': `${i * 0.1}s`,
+                    } as React.CSSProperties}
                   />
                 );
               })}
@@ -803,7 +833,7 @@ export default function FujiSnowMountain({ isNight = true }: { isNight?: boolean
 
           <MountainPath isNight={isNight} />
 
-          <FallingSnow isNight={isNight} />
+          <FallingSnow isNight={isNight} count={snowCount} />
 
           {cards.map((card) => (
             <CardComponent
@@ -835,21 +865,43 @@ export default function FujiSnowMountain({ isNight = true }: { isNight?: boolean
               stroke={isNight ? '#8b9cb0' : '#6b7c90'}
               strokeWidth="2"
             />
-            <motion.g
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <g className="climber-glow">
+              <style>
+                {`
+                  @keyframes climber-pulse {
+                    0%, 100% { opacity: 0.6; }
+                    50% { opacity: 1; }
+                  }
+                  .climber-glow {
+                    animation: climber-pulse 2s ease-in-out infinite;
+                  }
+                  @media (prefers-reduced-motion: reduce) {
+                    .climber-glow { animation: none; opacity: 0.8; }
+                  }
+                `}
+              </style>
               <circle cx="0" cy="-8" r="12" fill="#4ecdc4" opacity="0.2" />
-            </motion.g>
+            </g>
           </g>
 
           <g transform="translate(450, 490)">
-            <motion.g
-              animate={{ x: [-2, 2, -2] }}
-              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-            >
+            <g className="wind-sway">
+              <style>
+                {`
+                  @keyframes wind-sway {
+                    0%, 100% { transform: translateX(-2px); }
+                    50% { transform: translateX(2px); }
+                  }
+                  .wind-sway {
+                    animation: wind-sway 3s ease-in-out infinite;
+                  }
+                  @media (prefers-reduced-motion: reduce) {
+                    .wind-sway { animation: none; }
+                  }
+                `}
+              </style>
               <Wind size={20} className="text-white/40" />
-            </motion.g>
+            </g>
           </g>
         </svg>
 

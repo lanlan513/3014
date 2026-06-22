@@ -24,6 +24,7 @@ import {
   type GraphNode,
   type SongDetail,
 } from '@/data/songRelations';
+import { usePerformanceMode } from '@/hooks/usePerformanceMode';
 
 type FilterType = 'all' | 'song' | 'lyricist' | 'composer' | 'album' | 'style';
 
@@ -52,6 +53,15 @@ const typeColors: Record<string, string> = {
   style: '#a855f7',
 };
 
+const typeEmoji: Record<string, string> = {
+  song: '🎵',
+  lyricist: '✍️',
+  composer: '🎹',
+  album: '💿',
+  style: '✨',
+  theme: '💭',
+};
+
 export default function SongGraphPage() {
   const { nodes: initialNodes, edges } = useMemo(() => buildSongGraph(), []);
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
@@ -65,6 +75,7 @@ export default function SongGraphPage() {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLDivElement>(null);
+  const { isLowPerf, animationEnabled } = usePerformanceMode();
 
   const layoutedNodes = useMemo(() => {
     const width = 900;
@@ -419,7 +430,7 @@ export default function SongGraphPage() {
                   const dimmed = selectedNode && !isHighlighted;
 
                   return (
-                    <motion.line
+                    <line
                       key={`edge-${i}`}
                       x1={source.x}
                       y1={source.y}
@@ -430,29 +441,24 @@ export default function SongGraphPage() {
                       }
                       strokeWidth={isHighlighted ? 2 : 1}
                       opacity={dimmed ? 0.08 : isHighlighted ? 0.9 : 0.35}
-                      initial={{ pathLength: 0, opacity: 0 }}
-                      animate={{ pathLength: 1, opacity: undefined }}
-                      transition={{
-                        duration: 0.6,
-                        delay: i * 0.003,
-                        ease: 'easeOut',
-                      }}
                       style={{
                         filter: isHighlighted
                           ? 'drop-shadow(0 0 4px rgba(244, 197, 66, 0.5))'
                           : 'none',
+                        transition: 'opacity 0.2s ease-out, stroke 0.2s ease-out',
                       }}
                     />
                   );
                 })}
 
                 {visibleNodes.map((node) => {
-                  const Icon = typeIcons[node.type] || Music;
                   const isSelected = selectedNode?.id === node.id;
                   const isHovered = hoveredNode?.id === node.id;
                   const isConnected = connectedNodes.has(node.id);
                   const dimmed =
                     selectedNode && !isSelected && !isConnected;
+                  const scale = isSelected ? 1.2 : isHovered ? 1.1 : 1;
+                  const emoji = typeEmoji[node.type] || '🎵';
 
                   return (
                     <g
@@ -465,69 +471,59 @@ export default function SongGraphPage() {
                         setSelectedNode(isSelected ? null : node);
                       }}
                       style={{ cursor: 'pointer' }}
+                      className="graph-node"
                     >
                       {(isSelected || isHovered) && (
                         <circle
                           r={node.size + 14}
                           fill="url(#nodeGlow)"
                           opacity={0.8}
+                          style={{ transition: 'opacity 0.2s ease-out' }}
                         />
                       )}
 
-                      <motion.circle
-                        r={node.size}
+                      <circle
+                        r={node.size * scale}
                         fill={node.color + '33'}
                         stroke={node.color}
                         strokeWidth={isSelected ? 3 : isHovered ? 2 : 1}
                         opacity={dimmed ? 0.2 : 1}
-                        whileHover={{ scale: 1.2 }}
-                        whileTap={{ scale: 0.9 }}
-                        initial={{ scale: 0 }}
-                        animate={{ scale: 1 }}
-                        transition={{
-                          type: 'spring',
-                          stiffness: 200,
-                          damping: 15,
-                        }}
                         style={{
                           filter:
                             isSelected || isHovered
                               ? `drop-shadow(0 0 8px ${node.color}88)`
                               : 'none',
+                          transition: 'all 0.15s ease-out',
                         }}
                       />
 
                       <circle
-                        r={node.size * 0.55}
+                        r={node.size * 0.55 * scale}
                         fill={node.color + '66'}
                         opacity={dimmed ? 0.15 : 0.9}
+                        style={{ transition: 'all 0.15s ease-out' }}
                       />
 
-                      <foreignObject
-                        x={-node.size * 0.6}
-                        y={-node.size * 0.6}
-                        width={node.size * 1.2}
-                        height={node.size * 1.2}
+                      <text
+                        textAnchor="middle"
+                        dominantBaseline="central"
+                        fontSize={Math.max(node.size * 0.7, 10)}
                         opacity={dimmed ? 0.3 : 1}
+                        style={{ pointerEvents: 'none', userSelect: 'none' }}
                       >
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Icon
-                            size={Math.max(node.size * 0.6, 10)}
-                            color={node.color}
-                            strokeWidth={1.5}
-                          />
-                        </div>
-                      </foreignObject>
+                        {emoji}
+                      </text>
 
-                      {(isHovered || isSelected || node.size >= 24) && (
+                      {(!isLowPerf || isHovered || isSelected || node.size >= 24) && (
                         <text
                           y={node.size + 14}
                           textAnchor="middle"
                           fill={isSelected ? node.color : '#f5e6c8'}
                           fontSize={node.size >= 24 ? 11 : 9}
                           fontWeight={isSelected ? 700 : 500}
-                          opacity={dimmed ? 0.2 : 0.85}
+                          opacity={dimmed ? 0.2 : isHovered || isSelected ? 0.9 : 0.6}
                           className="font-display pointer-events-none select-none"
+                          style={{ transition: 'opacity 0.2s ease-out' }}
                         >
                           {node.name.length > 8
                             ? node.name.slice(0, 7) + '…'
