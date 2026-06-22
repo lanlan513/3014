@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Home, Disc3, Heart, Map, Disc, Mic2, PlayCircle, BarChart3 } from 'lucide-react';
+import { Home, Disc3, Heart, Map, Disc, Mic2, PlayCircle, BarChart3, Network, Palette, PieChart } from 'lucide-react';
 import { useFavoritesStore } from '@/stores/favoritesStore';
 import { moods } from '@/data/moods';
 
@@ -107,12 +107,48 @@ const NavBar = () => {
                 className={`flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
                   location.pathname.startsWith('/concert-stats')
                     ? 'bg-neon-purple/20 border border-neon-purple/30'
-                    : 'text-warm-100/70 hover:bg-neon-purple/10'
+                    : 'text-warm-100/70 hover:text-neon-purple hover:bg-neon-purple/10'
                 }`}
                 style={location.pathname.startsWith('/concert-stats') ? { color: '#a855f7' } : {}}
               >
                 <BarChart3 size={16} />
                 <span className="hidden md:inline">统计</span>
+              </Link>
+
+              <Link
+                to="/song-graph"
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/song-graph')
+                    ? 'bg-neon-cyan/20 border border-neon-cyan/30 text-neon-cyan'
+                    : 'text-warm-100/70 hover:text-neon-cyan hover:bg-neon-cyan/10'
+                }`}
+              >
+                <Network size={16} />
+                <span>图谱</span>
+              </Link>
+
+              <Link
+                to="/style-evolution"
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/style-evolution')
+                    ? 'bg-neon-warm/20 border border-neon-warm/30 text-neon-warm'
+                    : 'text-warm-100/70 hover:text-neon-warm hover:bg-neon-warm/10'
+                }`}
+              >
+                <Palette size={16} />
+                <span>风格</span>
+              </Link>
+
+              <Link
+                to="/mood-cluster"
+                className={`hidden lg:flex items-center gap-1.5 px-3 py-2 rounded-xl transition-all text-sm md:text-base ${
+                  location.pathname.startsWith('/mood-cluster')
+                    ? 'bg-neon-pink/20 border border-neon-pink/30 text-neon-pink'
+                    : 'text-warm-100/70 hover:text-neon-pink hover:bg-neon-pink/10'
+                }`}
+              >
+                <PieChart size={16} />
+                <span>情绪</span>
               </Link>
 
               <div className="hidden sm:flex items-center gap-0.5">
