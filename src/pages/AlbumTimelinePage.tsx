@@ -56,7 +56,7 @@ const AlbumTimelinePage = () => {
             专辑时间轴
           </h1>
           <p className="font-hand text-warm-200/60 text-base md:text-lg max-w-2xl mx-auto">
-            从1997到2017，跟随陈奕迅的音乐旅程，感受每一张专辑带来的感动与回忆
+            从1996到2024，跟随陈奕迅的音乐旅程，感受每一张专辑带来的感动与回忆
           </p>
         </motion.div>
 
@@ -337,7 +337,7 @@ const AlbumTimelinePage = () => {
               border: '1px solid rgba(244, 197, 66, 0.15)',
             }}
           >
-            ♪ 二十一年音乐旅程，感谢Eason的陪伴 ♪
+            ♪ 二十八年音乐旅程，感谢Eason的陪伴 ♪
           </div>
         </motion.div>
       </div>
