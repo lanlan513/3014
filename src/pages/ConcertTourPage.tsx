@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, MapPin, Music, Globe, Clock, Users, ChevronRight, Star } from 'lucide-react';
+import { Calendar, MapPin, Music, Globe, Clock, Users, ChevronRight, Star, Eye } from 'lucide-react';
 import {
   concertTours,
   concerts,
@@ -11,11 +12,33 @@ import {
 import { getMoodById } from '@/data/moods';
 
 const ConcertTourPage = () => {
-  const [selectedTourId, setSelectedTourId] = useState<string>(concertTours[0].id);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const initialTourId = searchParams.get('tour') || concertTours[0].id;
+  const [selectedTourId, setSelectedTourId] = useState<string>(initialTourId);
   const [selectedConcertId, setSelectedConcertId] = useState<string | null>(null);
   const [highlightedCityId, setHighlightedCityId] = useState<string | null>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const concertRefs = useRef<Record<string, HTMLDivElement | null>>({});
+
+  useEffect(() => {
+    const tourParam = searchParams.get('tour');
+    if (tourParam && tourParam !== selectedTourId) {
+      setSelectedTourId(tourParam);
+      setSelectedConcertId(null);
+    }
+  }, [searchParams, selectedTourId]);
+
+  useEffect(() => {
+    setSearchParams(params => {
+      if (selectedTourId !== concertTours[0].id) {
+        params.set('tour', selectedTourId);
+      } else {
+        params.delete('tour');
+      }
+      return params;
+    }, { replace: true });
+  }, [selectedTourId, setSearchParams]);
 
   const selectedTour = useMemo(
     () => concertTours.find((t) => t.id === selectedTourId),
@@ -58,6 +81,11 @@ const ConcertTourPage = () => {
   const handleConcertClick = (concertId: string, cityId: string) => {
     setSelectedConcertId(concertId);
     setHighlightedCityId(cityId);
+    openConcertDetail(concertId);
+  };
+
+  const openConcertDetail = (concertId: string) => {
+    navigate(`/concert/${concertId}`);
   };
 
   const handleCityClick = (cityId: string) => {
@@ -123,17 +151,19 @@ const ConcertTourPage = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
             {concertTours.map((tour, index) => {
               const isSelected = tour.id === selectedTourId;
-              const mood = getMoodById(tour.primaryMood);
               return (
                 <motion.a
                   key={tour.id}
-                  href={`/concert/${tour.id}`}
+                  href={`/concerts?tour=${tour.id}`}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 + index * 0.05 }}
                   whileHover={{ y: -4, scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={(e) => {
+                    if (e.ctrlKey || e.metaKey || e.button === 1) {
+                      return;
+                    }
                     e.preventDefault();
                     setSelectedTourId(tour.id);
                     setSelectedConcertId(null);
@@ -374,14 +404,15 @@ const ConcertTourPage = () => {
                                           <h4 className="font-display text-warm-100 text-sm md:text-base">
                                             {concert.title}
                                           </h4>
-                                          <ChevronRight
-                                            size={16}
-                                            className={`flex-shrink-0 mt-0.5 transition-colors ${
+                                          <div
+                                            className={`flex-shrink-0 mt-0.5 transition-all p-1 rounded ${
                                               isSelected
                                                 ? 'text-neon-pink'
                                                 : 'text-warm-200/40'
                                             }`}
-                                          />
+                                          >
+                                            <ChevronRight size={16} />
+                                          </div>
                                         </div>
 
                                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-hand text-warm-200/50 mb-2">
@@ -434,6 +465,18 @@ const ConcertTourPage = () => {
                                               {mood.emoji} {mood.name}
                                             </span>
                                           )}
+                                        </div>
+
+                                        <div
+                                          className="w-full mt-3 py-2 rounded-lg text-xs font-hand flex items-center justify-center gap-1.5 transition-all"
+                                          style={{
+                                            background: `linear-gradient(135deg, ${concert.coverColors[0]}33, ${concert.coverColors[1]}22)`,
+                                            color: concert.coverColors[1],
+                                            border: `1px solid ${concert.coverColors[1]}44`,
+                                          }}
+                                        >
+                                          <Eye size={12} />
+                                          点击查看曲目单和舞台设计
                                         </div>
 
                                         {isSelected && concert.notes && (

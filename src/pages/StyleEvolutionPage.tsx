@@ -247,7 +247,7 @@ export default function StyleEvolutionPage() {
                           key={era.name}
                           initial={{ opacity: 0, x: isLeft ? -30 : 30 }}
                           whileInView={{ opacity: 1, x: 0 }}
-                          viewport={{ once: true, margin: '-80px }}
+                          viewport={{ once: true, margin: '-80px' }}
                           transition={{ duration: 0.6, delay: idx * 0.08 }}
                           className={`relative flex items-start gap-4 md:gap-8 ${
                             isLeft
@@ -392,7 +392,7 @@ export default function StyleEvolutionPage() {
                           >
                             <div
                               className="w-7 h-7 rounded-lg flex items-center justify-center mb-2"
-                              style={{ backgroundColor: `${card.color}22`}
+                              style={{ backgroundColor: `${card.color}22` }}
                             >
                               <Icon size={14} style={{ color: card.color }} />
                             </div>
@@ -755,10 +755,7 @@ export default function StyleEvolutionPage() {
                             className="w-full rounded-t-md relative overflow-hidden"
                             style={{
                               height: `${heightPct}%`,
-                              background: `linear-gradient(180deg, ${yd.era?.color ||
-                                '#f4c542
-                                } 0%, ${yd.era?.color ||
-                                || '#f4c542'}99 100%)`,
+                              background: `linear-gradient(180deg, ${yd.era?.color || '#f4c542'} 0%, ${yd.era?.color || '#f4c542'}99 100%)`,
                               boxShadow: `0 0 8px ${yd.era?.color || '#f4c542'}55`,
                               transformOrigin: 'bottom',
                             }}
@@ -769,7 +766,7 @@ export default function StyleEvolutionPage() {
                             onClick={() => {
                               if (yd.era) {
                                 const idx = styleEvolution.indexOf(yd.era);
-                                if (idx >= 0 && setActiveEra(idx);
+                                if (idx >= 0) setActiveEra(idx);
                                 setViewMode('timeline');
                               }
                             }}

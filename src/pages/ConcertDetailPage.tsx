@@ -1,4 +1,4 @@
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import {
   ChevronLeft,
@@ -27,7 +27,6 @@ import { getMoodById } from '@/data/moods';
 
 const ConcertDetailPage = () => {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const concert = getConcertById(id || '');
   const tour = concert ? getTourById(concert.tourId) : undefined;
   const city = concert ? getCityById(concert.cityId) : undefined;
@@ -80,15 +79,15 @@ const ConcertDetailPage = () => {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 flex items-center justify-between"
         >
-          <button
-            onClick={() => navigate(-1)}
+          <Link
+            to={`/concerts?tour=${tour.id}`}
             className="inline-flex items-center gap-1 text-warm-200/70 hover:text-warm-300 transition-colors text-sm font-hand"
           >
             <ChevronLeft size={16} />
-            返回
-          </button>
+            返回「{tour.name}」
+          </Link>
           <Link
-            to="/concerts"
+            to={`/concerts?tour=${tour.id}`}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-warm-500/20 text-warm-200/70 hover:text-warm-300 transition-all text-xs font-hand"
           >
             <Music size={13} />
